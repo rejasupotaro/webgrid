@@ -1,0 +1,14 @@
+{
+  "name": "webgrid",
+	"description": "Application framework for Web Grid Computing.",
+  "version": "0.0.0",
+	"author": "Kentarou Takiguchi <takiguchi0817@gmail.com>",
+  "dependencies": {
+    "express": "*",
+    "socket.io": "*",
+		"jade": "*"
+  },
+  "keywords": ["framework", "webgrid"],
+	"main": "index",
+  "bin": { "webgrid": "./bin/webgrid" }
+}

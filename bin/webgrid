@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var fs = require('fs');
+var exec = require('child_process').exec;
+var path;
+
+var options = {};
+var exit = false;
+var arg;
+
+for (var i = 2; i < process.argv.length; i++) {
+  if (exit) {
+	  break;
+	}
+
+	arg = process.argv[i];
+
+	function nextArg(defaultValue) {
+	  var next = process.argv[++i] || defaultValue;
+
+		if (!next) {
+		  printUsage();
+			exit = true;
+		}
+
+		return next;
+	}
+
+	switch (arg) {
+	case '-h':
+	case '--help':
+	  printUsage();
+		exit = true;
+		break;
+	case '-p':
+	case '--port':
+	  options.port = nextArg();
+		break;
+	default:
+	  path = arg;
+	}
+}
+
+if (!exit) {
+  if (path != undefined) {
+    exec('cp -r ' + __dirname + '/../src ' + './' + path, function(err, out) {
+  	  if (err) return console.log('error', err);
+  		console.log('Success!')
+  	});
+	} else {
+	  printUsage();
+	}
+}
+
+function printUsage() {
+  var usage = [
+    "Usage: webgrid [options] [appfile]",
+    "",
+    "  Starts the Strata application contained in the given appfile.",
+    "  If none is given, uses ./app.js.",
+    "",
+    "Options:",
+    "  -h, --help      Show this help message and exit",
+    "  -p, --port      The port number to listen on (defaults to 1982)",
+    "  -v, --version   Show the current version of Strata and exit"
+  ];
+
+  console.log(usage.join("\n"));
+}
