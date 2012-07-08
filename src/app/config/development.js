@@ -1,4 +1,4 @@
 module.exports = {
-	user: 'user',
-	pass: 'pass'
+  port: 3000,
+	logLevel: 3
 }

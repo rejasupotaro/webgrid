@@ -1,54 +1,58 @@
 var webgrid = require('webgrid')
-  , env = process.env.NODE_ENV || 'development'
-  , config = require('./app/config/' + env)
-  , app = webgrid.createApp(__dirname, config, {})
-  , port = config.port || 3000
+var	app = webgrid.createApp(__dirname)
 
+// server setting
 app.configure(function() {
   app.use(webgrid.static(__dirname + '/app/public'))
-})
-
-app.configure('development', function() {
   app.use(webgrid.errorHandler({ dumpExceptions: true, showStack: true }))
 })
 
-app.configure('production', function() {
-  app.use(webgrid.errorHandler())
-})
-
-app.all('/admin', webgrid.basicAuth(function (user, pass) {
-  return user === config.user && pass === config.pass
-}))
-
+// routing
 routes = require('./app/routes')
 app.get('/', routes.index)
 app.get('/admin', routes.admin)
 
-app.listen(port)
-console.log('webgrid running on port ' + port)
 
-//var io = require('socket.io').listen(app)
+// socket event handling
 var io = webgrid.listen(app)
+var connectionCount = 0;
 io.sockets.on('connection', function(socket) {
-	console.log('connected')
+  connectionCount++
 
-	socket.on('message', function(message) {
-		console.log('on message: ' + message)
-		if (message.hasOwnProperty('page')) {
-  		var contents = webgrid.getPageContents(__dirname, message.page)
-			if (contents) { 
-				socket.emit('message', contents)
-			}
-    }
+  socket.on('requestTask', function() {
+    webgrid.getTask(function(task) {
+			socket.emit('task', task)
+		});
+  })
+
+	socket.on('sendResult', function(result) {
+		webgrid.setResult(result)
 	})
+
+  socket.on('requestView', function(view) {
+    var view = webgrid.compileView(__dirname, view)
+    if (view) {
+      socket.emit('view', view)
+    }
+  })
+
+  socket.on('requestInfo', function() {
+    webgrid.getServerLoad(function (serverLoad) {
+      var info = {
+        connectionCount: connectionCount,
+        taskProgress: webgrid.getTaskProgress(),
+        serverLoad: serverLoad 
+      }
+      socket.emit('info', info)
+    })
+  })
 
 	socket.on('disconnect', function() {
-		console.log('disconnected')
+    connectionCount--
 	})
 })
-
 /*
 process.on('uncaughtException', function(err) {
-	console.log('uncaughtException => ' + err)
+	console.log('uncaughtException: ' + err)
 })
 */

@@ -1,7 +1,52 @@
-h1= title
-p Welcome to #{title}
-p
-  button(type='button', onclick="getContents('home')") Home.
-  button(type='button', onclick="getContents('project')") Project.
+body(data-spy='scroll', data-target='.subnav', data-offset='50')
+  div.navbar.navbar-fixed-top
+    div.navbar-inner
+      div.container
+        a.btn.btn-navbar(data-toggle='collapse', data-target='.nav-collapse')
+          span.icon-var
+          span.icon-var
+          span.icon-var
+        a.brand	Web Grid
+        div.nav-collapse
+          ul.nav
+            li
+              a News
+            li
+              a Gallery
+            li.dropdown
+              a.dropdown-toggle(data-toggle='dropdown') Preview
+                b.caret
+              ul.dropdown-menu
+                li
+                  a Default
+                li.divider
+                li
+                  a Amelia
 
-#page-container
+  //
+    ここからメインコンテンツ
+  div.container
+    div.row
+      div.span12.well
+        div.row
+          div.span4
+            img.avatar.size128(src='/images/icon.jpg')
+          div.span4
+            h2 Takiguchi
+            h1= title
+            p Welcome to My Project Page 
+            p
+              button(type='button', onclick="requestTask()") Task 
+              button(type='button', onclick="requestContents('home')") Home
+              button(type='button', onclick="requestContents('project')") Project
+          div.span4
+            div contory: japan
+            div total: 1,000 points
+            div 100 points
+
+    //
+      非同期読み込みページ
+    div.row
+      div.span12.well
+        div#page-container
+
