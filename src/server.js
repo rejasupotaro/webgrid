@@ -37,20 +37,19 @@ io.sockets.on('connection', function(socket) {
   })
 
   socket.on('requestInfo', function() {
-    webgrid.getServerLoad(function (serverLoad) {
-      var info = {
-        connectionCount: connectionCount,
-        taskProgress: webgrid.getTaskProgress(),
-        serverLoad: serverLoad 
-      }
-      socket.emit('info', info)
-    })
+    var info = {
+      connectionCount: connectionCount,
+      taskProgress: webgrid.getTaskProgress(),
+      serverLoad: webgrid.getServerLoad()
+    }
+    socket.emit('info', info)
   })
 
 	socket.on('disconnect', function() {
     connectionCount--
 	})
 })
+
 /*
 process.on('uncaughtException', function(err) {
 	console.log('uncaughtException: ' + err)

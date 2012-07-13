@@ -25,7 +25,7 @@ module.exports.main = function() {
 
   //var dataNum = 10000000
   //var range =   100
-  var dataNum = 100
+  var dataNum = 100000
   var range = 100
   for (var i = 0; i < dataNum / range; i++) {
     var args = new Array();

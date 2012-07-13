@@ -1,4 +1,5 @@
 body(data-spy='scroll', data-target='.subnav', data-offset='50')
+  // ナビゲーションバー
   div.navbar.navbar-fixed-top
     div.navbar-inner
       div.container
@@ -6,7 +7,7 @@ body(data-spy='scroll', data-target='.subnav', data-offset='50')
           span.icon-var
           span.icon-var
           span.icon-var
-        a.brand	Web Grid
+        a.brand	WebGrid
         div.nav-collapse
           ul.nav
             li
@@ -23,30 +24,25 @@ body(data-spy='scroll', data-target='.subnav', data-offset='50')
                 li
                   a Amelia
 
-  //
-    ここからメインコンテンツ
+  // ここからメインコンテンツ
   div.container
     div.row
       div.span12.well
         div.row
           div.span4
-            img.avatar.size128(src='/images/icon.jpg')
-          div.span4
-            h2 Takiguchi
-            h1= title
-            p Welcome to My Project Page 
+            img.avatar.size64(src='/images/icon.jpg')
             p
-              button(type='button', onclick="requestTask()") Task 
-              button(type='button', onclick="requestContents('home')") Home
-              button(type='button', onclick="requestContents('project')") Project
-          div.span4
+              h1 Prime Test 
+              余っている計算資源を少しいただいて素数を求めます
+            p
+              a.btn(onclick="requestTask()") Task
+              a.btn(onclick="requestContents('home')") Home
+              a.btn(onclick="requestContents('project')") Project
             div contory: japan
             div total: 1,000 points
             div 100 points
+          div.span8#progress
 
-    //
-      非同期読み込みページ
     div.row
-      div.span12.well
-        div#page-container
+      div.span12.well#terminal
 
