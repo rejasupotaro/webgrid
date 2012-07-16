@@ -1,108 +1,104 @@
-var term;
+var webgrid = createWebGrid("http://localhost:3000")
 
-console.log_org = console.log
-console.log = function(text) {
-  if (term) {
-//    if ("toString" in text) {
-//      term.type(text.toString())
-//    } else {
-      term.type("" + text)
-//    }
-    term.newLine()
-    term.type("> ")
-  }
-  return console.log_org.apply(this, arguments)
+window.onload = function() {
+  termOpen()
+  drawGraph()
 }
 
-function termOpen() {
-  if ((!term) || (term.closed)) {
-    term = new Terminal(
-      {
-        cols: 140,
-        rows: 10,
-        termDiv: 'terminal',
-        bgColor: '#000000',
-        greeting: '%+r **** Welcome to WebGrid Project **** %-r%n%n * any text is simply echoed%n * for imports use the links at the left%n * type "exit" to quit.%n ',
-        handler: termHandler,
-        exitHandler: termExitHandler
-      }
-    );
-    term.open();
-    
-    console.log("text")
-
-    // dimm UI text
-    var mainPane = (document.getElementById)?
-      document.getElementById('mainPane') : document.all.mainPane;
-    if (mainPane) mainPane.className = 'lh15 dimmed';
-  }
+function stopTask() {
+  webgrid.setIsWorkable(false)
 }
 
-function termHandler() {
-  // default handler + exit
-  this.newLine();
-  if (this.lineBuffer.search(/^\s*exit\s*$/i) == 0) {
-    this.close();
-    return;
-  }
-  else if (this.lineBuffer != '') {
-    this.type('You typed: '+this.lineBuffer);
-    this.newLine();
-  }
-  this.prompt();
+// タスクをサーバーに要求する
+function requestTask() {
+  webgrid.setIsWorkable(true)
+  webgrid.socket.emit('requestTask')
 }
 
-function termExitHandler() {
-  // reset the UI
-  var mainPane = (document.getElementById)?
-    document.getElementById('mainPane') : document.all.mainPane;
-  if (mainPane) mainPane.className = 'lh15';
+// 指定されたコンテンツをサーバーに要求する
+function requestContents(view) {
+  webgrid.socket.emit('requestView', view)
 }
 
-
-// demo hooks
-
-function testInsertAsTypedText() {
-  if ((!term) || (term.closed)) {
-    alert('Please open a terminal first!');
-    return;
-  }
-  var t=prompt('Please enter a text to be typed:');
-  if (t) TermGlobals.insertText(t);
+// もろもろの情報をサーバーに要求する
+function requestInfo() {
+  webgrid.socket.emit('requestInfo')
 }
 
-var useMultiLineImport=false;
-
-function testMultiLine(funcFlag) {
-  if ((!term) || (term.closed)) {
-    alert('Please open a terminal first!');
-    return;
-  }
-  // set flag for handler
-  // if true, we'll use importMultiLineText(), else importEachLine()
-  useMultiLineImport=funcFlag;
+function drawGraph() {
+  var n = 10
+  var data = d3.range(n).map(function() { return 0 })
+ 
+  var margin = {top: 10, right: 10, bottom: 20, left: 40},
+      width = 600 - margin.left - margin.right,
+      height = 300 - margin.top - margin.bottom;
   
-  // set global keylock (else no key stroke will reach the form element)
-  TermGlobals.keylock = true;
+  var x = d3.scale.linear()
+      .domain([0, n - 1])
+      .range([0, width]);
   
-  // and show the multiline prompt
-  TermGlobals.setVisible('promptDiv', true);
-  document.forms.promptForm.content.focus();
-  // input will by handled by promptHandler
-}
+  var y = d3.scale.linear()
+      .domain([0, 1])
+      .range([height, 0]);
 
-function promptHandler(text) {
-  // hide the dialog
-  TermGlobals.setVisible('promptDiv', false);
+  var svg = d3.select("#progress").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  svg.append("defs").append("clipPath")
+      .attr("id", "clip")
+    .append("rect")
+      .attr("width", width)
+      .attr("height", height);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.svg.axis().scale(x).orient("bottom"));
   
-  // reset keylock and import the text
-  TermGlobals.keylock = false;
-  if (text) {
-    if (useMultiLineImport) {
-      TermGlobals.importMultiLine(text);
-    }
-    else {
-      TermGlobals.importEachLine(text);
-    }
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(d3.svg.axis().scale(y).orient("left"));
+
+  var line = d3.svg.line()
+      .x(function(d, i) { return x(i); })
+      .y(function(d, i) { return y(d); })
+
+  var path =
+     svg.append("g")
+    .attr("clip-path", "url(#clip)")
+    .append("path")
+    .data([data])
+    .attr("class", "line")
+    .attr("d", line)
+    .attr("stroke", "blue")
+    .attr("stroke-width", 2)
+    .attr("fill", "none");
+
+  tick();
+  
+  function tick() {
+    requestInfo()
+
+    // push a new data point onto the back
+    var taskProgress = webgrid.getTaskProgress() ? webgrid.getTaskProgress() : 0
+
+    //connectionCountData.push(connectionCount);
+    data.push(taskProgress);
+  
+    // redraw the line, and slide it to the left
+    path
+        .attr("d", line)
+        .attr("transform", null)
+      .transition()
+        .duration(2000)
+        .ease("linear")
+        .attr("transform", "translate(" + x(-1) + ")")
+        .each("end", tick);
+  
+    // pop the old data point off the front
+    data.shift();
   }
 }
