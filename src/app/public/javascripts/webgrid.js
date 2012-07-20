@@ -6,21 +6,25 @@ function createWebGrid(a) {
   var connectionCount = 1
   var taskPoint = 0
 
-  var isWorkable = true
+  var taskReceiver = function(task, callback) { callback(task) }
+  var resultReceiver = function(result) { socket.emit(result) }
 
   var worker = new Worker("/javascripts/background.js")
+  var isWorkable = true
   worker.onmessage = function(event) {
-    taskPoint += event.data.result.length
-    console.log(event.data.result)
+    var result = resultReceiver(event.data)
+    taskPoint += result.result.length
 
-    socket.emit("sendResult", event.data)
+    socket.emit("sendResult", result)
 
     if (isWorkable) requestTask()
   }
 
   socket.on("connect", function() {
     socket.on("task", function(task) {
-      worker.postMessage(task)
+      taskReceiver(task, function(task) {
+        worker.postMessage(task)
+      })
     })
 
     socket.on("info", function(info) {
@@ -29,12 +33,15 @@ function createWebGrid(a) {
 
       var taskProgressText = "task progress: " + taskProgress * 100 + "%" 
       document.getElementById("taskProgress").innerText = taskProgressText
+      //$("#taskProgress").innerText = taskProgressText
 
       var connectionCountText = "connection count: " + connectionCount
       document.getElementById("connectionCount").innerText = connectionCountText
+      //$("#connectionCount").innerText = connectionCountText
 
       var taskPointText = "your points: " + taskPoint + "pt"
       document.getElementById("point").innerText = taskPointText
+      //$("#point").innerText = taskPointText
     })
   })
 
@@ -47,6 +54,14 @@ function createWebGrid(a) {
 
     getTaskProgress: function() {
       return taskProgress
+    },
+
+    setTaskReceiver: function(func) {
+      taskReceiver = func
+    },
+
+    setResultReceiver: function(func) {
+      resultReceiver = func
     }
   }
 }

@@ -1,5 +1,27 @@
 var webgrid = createWebGrid("http://localhost:3000")
 
+webgrid.setTaskReceiver(function(task, callback) {
+  function receiveJson(json) {
+    console.log(json)
+    var str = '';
+    for (var i = 0; i < json.length; i++) {
+      var obj = json[i];
+      str += obj.text + '。';
+    }
+
+    task.args = str
+    callback(task)
+  }
+
+  var param = 'count=10';
+  TwitterAPI.statuses.user_timeline(receiveJson, task.args, param)
+})
+
+webgrid.setResultReceiver(function(result) {
+  console.log(result)
+  return result
+})
+
 window.onload = function() {
   termOpen()
   drawGraph()
