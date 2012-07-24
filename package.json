@@ -5,8 +5,8 @@
   "author": "Kentarou Takiguchi <takiguchi0817@gmail.com>",
   "dependencies": {
     "express": "~2.5.11",
-    "socket.io": "*",
-    "jade": "*",
+    "socket.io": "~0.9.6",
+    "jade": "~0.21.0",
     "uglify-js": "~1.3.2"
   },
   "keywords": [
