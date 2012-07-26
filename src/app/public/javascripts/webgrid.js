@@ -20,6 +20,14 @@ function createWebGrid(a) {
     if (isWorkable) requestTask()
   }
 
+  function setText(elem, text) {
+    if (elem.innerText) {
+      elem.innerText = text
+    } else {
+      elem.textContent = text
+    }
+  }
+
   socket.on("connect", function() {
     socket.on("task", function(task) {
       taskReceiver(task, function(task) {
@@ -32,16 +40,13 @@ function createWebGrid(a) {
       connectionCount = info.connectionCount
 
       var taskProgressText = "task progress: " + taskProgress * 100 + "%" 
-      document.getElementById("taskProgress").innerText = taskProgressText
-      //$("#taskProgress").innerText = taskProgressText
+      setText($("#taskProgress")[0], taskProgressText)
 
       var connectionCountText = "connection count: " + connectionCount
-      document.getElementById("connectionCount").innerText = connectionCountText
-      //$("#connectionCount").innerText = connectionCountText
+      setText($("#connectionCount")[0], connectionCountText)
 
       var taskPointText = "your points: " + taskPoint + "pt"
-      document.getElementById("point").innerText = taskPointText
-      //$("#point").innerText = taskPointText
+      setText($("#point")[0], taskPointText)
     })
   })
 
