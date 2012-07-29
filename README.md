@@ -1,5 +1,5 @@
 
 # WebGrid
   
-	Single Page Application Framework for Web Grid Computing 
+	Web Application Framework for Web Grid Computing 
   

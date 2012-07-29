@@ -49,7 +49,7 @@ if (!exit) {
   if (path != undefined) {
     exec('cp -r ' + __dirname + '/../src ' + './' + path, function(err, out) {
   	  if (err) return console.log('error', err);
-  		console.log('Success!')
+  		console.log('create project: ' + path)
   	});
 	} else {
 	  printUsage();
