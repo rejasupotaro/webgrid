@@ -12,12 +12,18 @@ function createWebGrid(a) {
   var worker = new Worker("/javascripts/background.js")
   var isWorkable = true
   worker.onmessage = function(event) {
-    var result = resultReceiver(event.data)
-    taskPoint += result.result.length
+    var data = event.data
+    if (typeof data.log != "undefined") {
+      console.log(data.log)
+    } else {
+      var result = resultReceiver(data)
+      if (!data.error) {
+        taskPoint += result.result.length
+      }
 
-    socket.emit("sendResult", result)
-
-    if (isWorkable) requestTask()
+      socket.emit("sendResult", result)
+      if (isWorkable) requestTask()
+    }
   }
 
   function setText(elem, text) {
