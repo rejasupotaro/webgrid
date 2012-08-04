@@ -21,8 +21,8 @@ exports.main = function() {
     return result
   }
 
-  var dataNum = 100000
-  var range = 100 
+  var dataNum = 10000000
+  var range = 50000
   for (var i = 0; i < dataNum / range; i++) {
     var args = new Array();
     for (var j = 0; j < range; j++) {
@@ -31,7 +31,7 @@ exports.main = function() {
         args.push(n);
       }   
     }   
-    #__PARALLEL__(primaryTest, args)
+    #__REGISTER__(primaryTest, args)
   }
   return this
 }

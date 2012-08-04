@@ -1,9 +1,7 @@
 var webgrid = createWebGrid("#__ADDRESS__")
 
 webgrid.setTaskReceiver(function(task, callback) {
-  setTimeout(function() {
-    callback(task)
-  }, 100)
+  callback(task)
 })
 
 webgrid.setResultReceiver(function(result) {
